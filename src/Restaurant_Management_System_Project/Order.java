@@ -5,6 +5,7 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Order implements OrderInfo {
+    private static int referenceCounter = 0;
     private int orderId;
     private ArrayList<Integer> quantities;
     private double totalPrice;
@@ -19,6 +20,11 @@ public class Order implements OrderInfo {
         orderId = 0;
         quantities = new ArrayList<>();
         totalPrice = 0.0;
+        totalBill = 0.0;
+        discount = 0.0;
+        redeemPoints = 0;
+        customer = new Customer();
+        referenceCounter++;
     }
 
     public int getOrderId() {
@@ -85,96 +91,26 @@ public class Order implements OrderInfo {
         this.discount = discount;
     }
 
+    public static int getReferenceCounter() {
+        return referenceCounter;
+    }
+
+    public static void setReferenceCounter(int referenceCounter) {
+        Order.referenceCounter = referenceCounter;
+    }
+
+    private void applyDiscount() {
+        double discountPercentage = redeemPoints / 10.0;
+
+        discount = totalPrice * (discountPercentage / 100);
+    }
+
     public void setter(ArrayList<Customer> availableCustomer, ArrayList<Menu> availableMenu) {
         int found = 0;
 
         Scanner input = new Scanner(System.in);
-        System.out.println("Enter order id: ");
-        orderId = input.nextInt();
 
-        System.out.println("Enter Customer id: ");
-        int customerId = input.nextInt();
-
-        for (Customer c : availableCustomer) {
-            if (customerId == c.getCustomerId()) {
-                found = 1;
-                customer = c;
-                break;
-            }
-        }
-
-        if (found == 0) {
-            System.out.println("Customer not found. Do you want to add customer(y/n)");
-            char option = input.next().toLowerCase().charAt(0);
-
-            if (option == 'y') {
-                customer = new Customer();
-                customer.setter();
-                availableCustomer.add(customer);
-            }
-
-            else if (option == 'n') {
-                return;
-            }
-
-            else {
-                System.out.println("Error!! Invalid input.");
-                return;
-            }
-        }
-
-        System.out.println("***Menu***");
-        for (Menu m : availableMenu) {
-            m.display();
-        }
-
-        while (true) {
-            System.out.println("Enter item id to order (or -1 to finish):");
-            int itemId = input.nextInt();
-
-            if (itemId == -1) {
-                break;
-            }
-
-            Menu selectedItem = null;
-
-            for (Menu m : availableMenu) {
-                if (itemId == m.getItemId()) {
-                    selectedItem = m;
-                    break;
-                }
-            }
-
-            if (selectedItem == null) {
-                System.out.println("Invalid item id. Try again");
-                continue;
-            }
-
-            System.out.println("Enter quantity for " + selectedItem.getName() + ": ");
-            int quantity = input.nextInt();
-
-            menu.add(selectedItem);
-            quantities.add(quantity);
-            totalPrice = selectedItem.getPrice() * quantity;
-
-        }
-
-    }
-
-    public void update(ArrayList<Customer> availableCustomer, ArrayList<Menu> availableMenu) {
-        int found = 0;
-        Scanner input = new Scanner(System.in);
-        while (true) {
-            try {
-                System.out.println("Enter order id: ");
-                orderId = input.nextInt();
-                input.nextLine();
-                break;
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter a valid integer for order id.");
-                input.nextLine();
-            }
-        }
+        orderId = referenceCounter;
 
         int customerId = 0;
         while (true) {
@@ -198,20 +134,29 @@ public class Order implements OrderInfo {
         }
 
         if (found == 0) {
-            System.out.println("Customer not found. Do you want to add customer (y/n):");
-            char option = input.next().toLowerCase().charAt(0);
+            while (true) {
+                System.out.println("Customer not found. Do you want to add customer (y/n):");
+                String inputString = input.next().toLowerCase();
 
-            if (option == 'y') {
-                customer = new Customer();
-                customer.setter();
-                availableCustomer.add(customer);
-            } else if (option == 'n') {
-                System.out.println("Exiting... No order placed.");
-                return;
-            } else {
-                System.out.println("Error! Invalid input.");
-                return;
+                if (inputString.length() == 1) {
+                    char option = inputString.charAt(0);
+
+                    if (option == 'y') {
+                        customer = new Customer();
+                        customer.setter();
+                        availableCustomer.add(customer);
+                        break;
+                    } else if (option == 'n') {
+                        System.out.println("Exiting... No order placed.");
+                        return;
+                    } else {
+                        System.out.println("Error! Invalid input.");
+                    }
+                } else {
+                    System.out.println("Error! Please enter a single character ('y' or 'n').");
+                }
             }
+
         }
 
         System.out.println("***Menu***");
@@ -270,24 +215,254 @@ public class Order implements OrderInfo {
             totalPrice += selectedItem.getPrice() * quantity;
         }
 
+        while (true) {
+            System.out.println("Do you want to redeem loyalty points? (y/n)");
+            String inputString = input.next().toLowerCase();
+        
+            if (inputString.length() == 1) {
+                char option = inputString.charAt(0);
+        
+                if (option == 'y') {
+                    if(customer.getLoyaltyPoints()==0){
+                        System.out.println("Sorry you have zero loyalty points.");
+                        break;
+                    }
+                    System.out.println("Available loyalty points: " + customer.getLoyaltyPoints());
+                    int redeemPoint;
+        
+                    while (true) {
+                        try {
+                            System.out.println("Enter redeem points: ");
+                            redeemPoint = input.nextInt();
+                            input.nextLine();
+        
+                            if (redeemPoint > customer.getLoyaltyPoints()) {
+                                System.out.println("You don't have enough loyalty points. Please try again.");
+                            } else if (redeemPoint > 300) {
+                                System.out.println("You cannot redeem more than 300 points. Please try again.");
+                            } else {
+                                this.redeemPoints = redeemPoint;
+                                System.out.println("Successfully redeemed " + redeemPoint + " points.");
+                                break;
+                            }
+                        } catch (InputMismatchException e) {
+                            System.out.println("Invalid input. Please enter a valid integer for redeem points.");
+                            input.nextLine(); 
+                        }
+                    }
+                    break; 
+                } else if (option == 'n') {
+                    System.out.println("No loyalty points redeemed.");
+                    break;
+                } else {
+                    System.out.println("Invalid input. Please enter 'y' or 'n'.");
+                }
+            } else {
+                System.out.println("Error! Please enter a single character ('y' or 'n').");
+            }
+        }
+        
+        if (redeemPoints > 0) {
+            applyDiscount();
+            totalBill = totalPrice - discount;
+            int loyaltyPoints = customer.getLoyaltyPoints() - redeemPoints;
+            customer.setLoyaltyPoints(loyaltyPoints);
+        } else {
+            totalBill = totalPrice;
+        }
+
         customer.increamentOrderCount();
 
     }
 
-    
+    public void update(ArrayList<Customer> availableCustomer, ArrayList<Menu> availableMenu) {
+        int found = 0;
+
+        int loyaltyPoints = customer.getLoyaltyPoints() + redeemPoints;
+        customer.setLoyaltyPoints(loyaltyPoints);
+
+        Scanner input = new Scanner(System.in);
+
+        int customerId = 0;
+        while (true) {
+            try {
+                System.out.println("Enter new Customer id: ");
+                customerId = input.nextInt();
+                input.nextLine();
+                break;
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a valid integer for customer id.");
+                input.nextLine();
+            }
+        }
+
+        for (Customer c : availableCustomer) {
+            if (customerId == c.getCustomerId()) {
+                found = 1;
+                customer = c;
+                break;
+            }
+        }
+
+        if (found == 0) {
+            while (true) {
+                System.out.println("Customer not found. Do you want to add customer (y/n):");
+                String inputString = input.next().toLowerCase();
+
+                if (inputString.length() == 1) {
+                    char option = inputString.charAt(0);
+
+                    if (option == 'y') {
+                        customer = new Customer();
+                        customer.setter();
+                        availableCustomer.add(customer);
+                        break;
+                    } else if (option == 'n') {
+                        System.out.println("Exiting... No order placed.");
+                        return;
+                    } else {
+                        System.out.println("Error! Invalid input.");
+                    }
+                } else {
+                    System.out.println("Error! Please enter a single character ('y' or 'n').");
+                }
+            }
+
+        }
+
+        System.out.println("***Menu***");
+        for (Menu m : availableMenu) {
+            m.display();
+        }
+
+        while (true) {
+            int itemId = 0;
+
+            while (true) {
+                try {
+                    System.out.println("Enter item id to order (or -1 to finish):");
+                    itemId = input.nextInt();
+                    input.nextLine();
+                    break;
+                } catch (InputMismatchException e) {
+                    System.out.println("Invalid input. Please enter a valid integer for item id.");
+                    input.nextLine();
+                }
+            }
+
+            if (itemId == -1) {
+                break;
+            }
+
+            Menu selectedItem = null;
+
+            for (Menu m : availableMenu) {
+                if (itemId == m.getItemId()) {
+                    selectedItem = m;
+                    break;
+                }
+            }
+
+            if (selectedItem == null) {
+                System.out.println("Invalid item id. Try again.");
+                continue;
+            }
+
+            int quantity = 0;
+            while (true) {
+                try {
+                    System.out.println("Enter quantity for " + selectedItem.getName() + ": ");
+                    quantity = input.nextInt();
+                    input.nextLine();
+                    break;
+                } catch (InputMismatchException e) {
+                    System.out.println("Invalid input. Please enter a valid integer for quantity.");
+                    input.nextLine();
+                }
+            }
+
+            menu.add(selectedItem);
+            quantities.add(quantity);
+            totalPrice += selectedItem.getPrice() * quantity;
+        }
+
+        while (true) {
+            System.out.println("Do you want to redeem loyalty points? (y/n)");
+            String inputString = input.next().toLowerCase();
+
+            if (inputString.length() == 1) {
+                char option = inputString.charAt(0);
+
+                if (option == 'y') {
+                    System.out.println("Available loyalty points: " + customer.getLoyaltyPoints());
+                    int redeemPoints;
+                    while (true) {
+                        try {
+                            System.out.println("Enter redeem points: ");
+                            redeemPoints = input.nextInt();
+                            input.nextLine();
+                            break;
+                        } catch (Exception e) {
+                            System.out.println("Invalid input. Please enter a valid input for redeem points.");
+                            input.nextLine();
+                        }
+                    }
+
+                    if (redeemPoints > customer.getLoyaltyPoints()) {
+                        System.out.println("You dont have enough loyalty point.");
+                        break;
+                    } else if (redeemPoints > 300) {
+                        System.out.println("You can not redeem more than 300 points");
+                        break;
+                    } else {
+                        this.redeemPoints = redeemPoints;
+                        break;
+                    }
+
+                } else if (option == 'n') {
+                    break;
+                } else {
+                    System.out.println("Invalid input.");
+                }
+
+            } else {
+                System.out.println("Error! Please enter a single character ('y' or 'n').");
+            }
+        }
+        if (redeemPoints > 0) {
+            applyDiscount();
+            totalBill = totalPrice - discount;
+            loyaltyPoints = customer.getLoyaltyPoints() - redeemPoints;
+            customer.setLoyaltyPoints(loyaltyPoints);
+        } else {
+            totalBill = totalPrice;
+        }
+
+        customer.increamentOrderCount();
+
+    }
 
     public void generateRecipt() {
-        System.out.println("***ORDER***");
-        System.out.println("Order id: " + orderId);
-        System.out.println("Customer Id: " + customer.getCustomerId());
-        System.out.println("Customer name: " + customer.name);
+        System.out.println("======================================");
+        System.out.printf("Order ID: %d%n", orderId);
+        System.out.printf("Customer ID: %s%n", customer.getCustomerId());
+        System.out.printf("Customer Name: %s%n", customer.name);
+        System.out.println("--------------------------------------");
+        System.out.printf("%-20s %5s %10s%n", "Item", "Qty", "Price");
+        System.out.println("--------------------------------------");
+
         for (int i = 0; i < menu.size(); i++) {
             Menu item = menu.get(i);
             int qty = quantities.get(i);
-            System.out.println(item.getName() + " x" + qty + " = " + (item.getPrice() * qty));
+            double itemTotal = item.getPrice() * qty;
+            System.out.printf("%-20s %5d %10.2f%n", item.getName(), qty, itemTotal);
         }
-        System.out.println("Total bill: " + totalPrice);
 
+        System.out.println("--------------------------------------");
+        System.out.printf("Subtotal: %28.2f%n", totalPrice);
+        System.out.printf("Discount: %28.2f%n", discount);
+        System.out.printf("Total Bill: %26.2f%n", totalBill);
+        System.out.println("======================================");
     }
 
 }

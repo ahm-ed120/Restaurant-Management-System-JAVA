@@ -44,7 +44,7 @@ public class Customer extends Person {
     }
 
     private void calculateLoyaltyPoints(){
-        this.loyaltyPoints = orderCount * 10;
+        this.loyaltyPoints += 10;
     }
 
     public void setter() {

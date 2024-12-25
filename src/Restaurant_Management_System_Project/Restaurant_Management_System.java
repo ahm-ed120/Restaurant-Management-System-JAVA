@@ -5,24 +5,22 @@ import java.util.ArrayList;
 public class Restaurant_Management_System {
 
     public static void main(String[] args) {
-        ArrayList <Menu> menu = new ArrayList<>();
-        ArrayList <Customer> customer = new ArrayList<>();
-        Order o = new Order();
-
-        Menu m = new Menu();
-        m.setter();
-        menu.add(m);
+        ArrayList<Customer> customer = new ArrayList<>();
+        ArrayList<Menu> menu = new ArrayList<>();
         Customer c = new Customer();
+        Menu m = new Menu();
         c.setter();
+        m.setter();
         customer.add(c);
-        o.setter(customer, menu);
+        menu.add(m);
 
-        System.out.println();
-        for (Customer c1 : customer){
-            c1.display();
-        }
+        Order order = new Order();
+        order.setter(customer, menu);
+        order.generateRecipt();
+        order.setter(customer, menu);
+        order.generateRecipt();
+        order.setter(customer,menu);
 
-        o.generateRecipt();
     }
     
     
