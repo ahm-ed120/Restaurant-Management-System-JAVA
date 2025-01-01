@@ -68,6 +68,7 @@ public class Waiter extends Employee {
     }
 
     public void update() {
+        tableAssigned.clear();
         super.setter();
         Scanner input = new Scanner(System.in);
 

@@ -159,6 +159,11 @@ public class Order implements OrderInfo {
 
         }
 
+        if (availableMenu == null){
+            System.out.println("Menu is not available!!!");
+            return;
+        }
+
         System.out.println("***Menu***");
         for (Menu m : availableMenu) {
             m.display();
@@ -277,6 +282,8 @@ public class Order implements OrderInfo {
 
     public void update(ArrayList<Customer> availableCustomer, ArrayList<Menu> availableMenu) {
         int found = 0;
+        menu.clear();
+        quantities.clear();
 
         int loyaltyPoints = customer.getLoyaltyPoints() + redeemPoints;
         customer.setLoyaltyPoints(loyaltyPoints);
