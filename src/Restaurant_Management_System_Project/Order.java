@@ -105,7 +105,7 @@ public class Order implements OrderInfo {
         discount = totalPrice * (discountPercentage / 100);
     }
 
-    public void setter(ArrayList<Customer> availableCustomer, ArrayList<Menu> availableMenu) {
+    public int setter(ArrayList<Customer> availableCustomer, ArrayList<Menu> availableMenu) {
         int found = 0;
 
         Scanner input = new Scanner(System.in);
@@ -148,7 +148,7 @@ public class Order implements OrderInfo {
                         break;
                     } else if (option == 'n') {
                         System.out.println("Exiting... No order placed.");
-                        return;
+                        return 0;
                     } else {
                         System.out.println("Error! Invalid input.");
                     }
@@ -161,7 +161,7 @@ public class Order implements OrderInfo {
 
         if (availableMenu == null){
             System.out.println("Menu is not available!!!");
-            return;
+            return 0;
         }
 
         System.out.println("***Menu***");
@@ -277,13 +277,12 @@ public class Order implements OrderInfo {
         }
 
         customer.increamentOrderCount();
+        return 1;
 
     }
 
-    public void update(ArrayList<Customer> availableCustomer, ArrayList<Menu> availableMenu) {
+    public int update(ArrayList<Customer> availableCustomer, ArrayList<Menu> availableMenu) {
         int found = 0;
-        menu.clear();
-        quantities.clear();
 
         int loyaltyPoints = customer.getLoyaltyPoints() + redeemPoints;
         customer.setLoyaltyPoints(loyaltyPoints);
@@ -326,7 +325,7 @@ public class Order implements OrderInfo {
                         break;
                     } else if (option == 'n') {
                         System.out.println("Exiting... No order placed.");
-                        return;
+                        return 0;
                     } else {
                         System.out.println("Error! Invalid input.");
                     }
@@ -336,6 +335,9 @@ public class Order implements OrderInfo {
             }
 
         }
+
+        menu.clear();
+        quantities.clear();
 
         System.out.println("***Menu***");
         for (Menu m : availableMenu) {
@@ -446,10 +448,26 @@ public class Order implements OrderInfo {
         }
 
         customer.increamentOrderCount();
+        return 1;
+
+    }
+
+    public void display(){
+        System.out.println("Order id: " + orderId);
+        System.out.println("Customer Id: " + customer.getCustomerId());
+        System.out.println("Customer name: " + customer.name);
+        for (int i = 0; i < menu.size(); i++) {
+            Menu item = menu.get(i);
+            int qty = quantities.get(i);
+            System.out.println(item.getName() + " x" + qty + " = " + (item.getPrice() * qty));
+        }
+        System.out.println("Total bill: " + totalPrice);
 
     }
 
     public void generateRecipt() {
+        System.out.println("======================================");
+        System.out.println("                RECIPT                ");
         System.out.println("======================================");
         System.out.printf("Order ID: %d%n", orderId);
         System.out.printf("Customer ID: %s%n", customer.getCustomerId());

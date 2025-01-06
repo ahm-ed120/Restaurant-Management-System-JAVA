@@ -229,14 +229,16 @@ public class Employee extends Person implements EmployeeInfo {
 
     @Override
     public void displaySalary() {
-        System.out.println("\n---------------------------------------------------------------------");
+        System.out.println("=====================================================================");
+        System.out.println("                          Salary Slip                                ");
+        System.out.println("---------------------------------------------------------------------");
         System.out.println("Employee ID        : " + employeeId);
         System.out.println("Employee Name      : " + name);
         System.out.println("Base Salary        : $" + String.format("%.2f", salary));
         System.out.println("Bonus              : $" + String.format("%.2f", bonus));
         System.out.println("----------------------------------------------------------------------");
         System.out.println("Total Salary       : $" + String.format("%.2f", totalSalary));
-        System.out.println("----------------------------------------------------------------------");
+        System.out.println("======================================================================");
 
     }
 
