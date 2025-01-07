@@ -159,7 +159,7 @@ public class Order implements OrderInfo {
 
         }
 
-        if (availableMenu == null){
+        if (availableMenu.isEmpty()){
             System.out.println("Menu is not available!!!");
             return 0;
         }

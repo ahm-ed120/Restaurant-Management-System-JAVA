@@ -13,14 +13,14 @@ public class Restaurant_Management_System {
             return 0;
         }
 
-        String username = console.readLine("Login: ");
+        String login = console.readLine("Login: ");
 
         char[] passwordArray = console.readPassword("Password: ");
         String password = new String(passwordArray);
 
         String correctLogin = "ahmedullah6897@gmail.com";
         String correctPassword = "Ahmedullah1@";
-        if (username.equals(correctLogin) && password.equals(correctPassword)) {
+        if (login.equals(correctLogin) && password.equals(correctPassword)) {
             System.out.println("Login successful.");
             return 1;
         } else {
@@ -40,8 +40,8 @@ public class Restaurant_Management_System {
         System.out.println("********RESTAURANT MANAGEMENT SYSTEM********");
         while (true) {
             System.out.println("\n***MAIN MENU***\n");
-            System.out.println("1.Admin");
-            System.out.println("2.Customer");
+            System.out.println("1.Admin Portal");
+            System.out.println("2.Customer Portal");
             System.out.println("0.Exit");
 
             int choice;
@@ -119,19 +119,19 @@ public class Restaurant_Management_System {
 
                                                 switch (choice3) {
                                                     case 1:
-                                                        Employee e = new Chef();
-                                                        e.setter();
-                                                        employee.add(e);
+                                                        Chef c = new Chef();
+                                                        c.setter();
+                                                        employee.add(c);
                                                         break;
                                                     case 2:
-                                                        Employee e1 = new Waiter();
-                                                        e1.setter();
-                                                        employee.add(e1);
+                                                        Waiter w = new Waiter();
+                                                        w.setter();
+                                                        employee.add(w);
                                                         break;
                                                     case 3:
-                                                        Employee e2 = new Janitor();
-                                                        e2.setter();
-                                                        employee.add(e2);
+                                                        Janitor j = new Janitor();
+                                                        j.setter();
+                                                        employee.add(j);
                                                         break;
                                                     default:
                                                         System.out.println("Invalid input.");
